@@ -1,0 +1,148 @@
+# ============================================================
+#  NAO WoZ  –  configuration
+#  Edit values freely. Lists become buttons in the interface.
+#  Keyboard shortcuts ("key") use the form  "ctrl+shift+1", "alt+h" ...
+# ============================================================
+
+robot_ips:
+  - 192.168.1.100
+  - nao.local
+port: 9559
+
+# Where camera snapshots are written on this computer
+snapshot_dir: snapshots
+# Where microphone recordings are written ON THE ROBOT
+robot_record_dir: /home/nao/recordings
+
+# ---------- defaults applied when connecting ----------
+on_connect:
+  volume: 60                    # 0-100   ("" = leave unchanged)
+  voice_speed: 100              # 50-400
+  voice_pitch: 1.0              # 0.5-4.0
+  language: English             # must be installed on the robot
+  autonomous_life: ""           # solitary | interactive | disabled | safeguard | ""
+  basic_awareness: ""           # true | false | ""
+  blinking: ""                  # true | false | ""
+  eye_color: ""                 # name from `colors` below, or ""
+
+# ---------- speech presets ----------
+# Use ^start(animations/Stand/Gestures/Hey_1) ... ^wait(...) tags for animated speech.
+speech:
+  - title: Hello
+    text: "^start(animations/Stand/Gestures/Hey_1) Hello! My name is Nao. Nice to meet you. ^wait(animations/Stand/Gestures/Hey_1)"
+    animated: true
+    key: ctrl+1
+  - title: How are you
+    text: "How are you today?"
+    animated: true
+    key: ctrl+2
+  - title: "Yes"
+    text: "^start(animations/Stand/Gestures/Yes_1) Yes, that is right. ^wait(animations/Stand/Gestures/Yes_1)"
+    animated: true
+    key: ctrl+3
+  - title: "No"
+    text: "^start(animations/Stand/Gestures/No_1) No, I do not think so. ^wait(animations/Stand/Gestures/No_1)"
+    animated: true
+    key: ctrl+4
+  - title: Thank you
+    text: "Thank you very much!"
+    animated: true
+    key: ctrl+5
+  - title: Please repeat
+    text: "Sorry, I did not understand. Could you please repeat that?"
+    animated: true
+    key: ctrl+6
+  - title: Goodbye
+    text: "^start(animations/Stand/Gestures/Hey_6) Goodbye! It was nice talking to you. ^wait(animations/Stand/Gestures/Hey_6)"
+    animated: true
+    key: ctrl+7
+
+# ---------- favourite animations (full list is read from the robot) ----------
+animations:
+  - title: Hey
+    name: animations/Stand/Gestures/Hey_1
+    key: alt+1
+  - title: "Yes"
+    name: animations/Stand/Gestures/Yes_1
+    key: alt+2
+  - title: "No"
+    name: animations/Stand/Gestures/No_1
+    key: alt+3
+  - title: Explain
+    name: animations/Stand/Gestures/Explain_1
+    key: alt+4
+  - title: Thinking
+    name: animations/Stand/Gestures/Thinking_1
+    key: alt+5
+  - title: Me
+    name: animations/Stand/Gestures/Me_1
+  - title: You
+    name: animations/Stand/Gestures/You_1
+  - title: Please
+    name: animations/Stand/Gestures/Please_1
+  - title: Excited
+    name: animations/Stand/Gestures/Excited_1
+  - title: Enthusiastic
+    name: animations/Stand/Gestures/Enthusiastic_4
+  - title: Confused
+    name: animations/Stand/Gestures/Confused_1
+  - title: Desperate
+    name: animations/Stand/Gestures/Desperate_1
+  - title: Bored
+    name: animations/Stand/Gestures/Bored_1
+  - title: Salute
+    name: animations/Stand/Gestures/Salute_1
+  - title: Show sky
+    name: animations/Stand/Gestures/ShowSky_1
+  - title: Show floor
+    name: animations/Stand/Gestures/ShowFloor_1
+  - title: Happy
+    name: animations/Stand/Emotions/Positive/Happy_1
+  - title: Proud
+    name: animations/Stand/Emotions/Positive/Proud_1
+  - title: Laugh
+    name: animations/Stand/Emotions/Positive/Laugh_1
+  - title: Sad
+    name: animations/Stand/Emotions/Negative/Sad_1
+  - title: Angry
+    name: animations/Stand/Emotions/Negative/Angry_1
+  - title: Fearful
+    name: animations/Stand/Emotions/Negative/Fearful_1
+  - title: Air guitar
+    name: animations/Stand/Waiting/AirGuitar_1
+  - title: Stretch
+    name: animations/Stand/Gestures/Stretch_1
+  - title: Wipe forehead
+    name: animations/Stand/Waiting/WipeForehead_1
+
+# ---------- LED colour presets (0-255) ----------
+colors:
+  - {title: White,   r: 255, g: 255, b: 255, key: shift+1, is_default: true}
+  - {title: Blue,    r: 0,   g: 120, b: 255, key: shift+2}
+  - {title: Green,   r: 0,   g: 220, b: 90,  key: shift+3}
+  - {title: Red,     r: 255, g: 40,  b: 40,  key: shift+4}
+  - {title: Yellow,  r: 255, g: 220, b: 0,   key: shift+5}
+  - {title: Purple,  r: 170, g: 60,  b: 255, key: shift+6}
+  - {title: Cyan,    r: 0,   g: 230, b: 230, key: shift+7}
+  - {title: Orange,  r: 255, g: 140, b: 0,   key: shift+8}
+  - {title: Pink,    r: 255, g: 105, b: 180, key: shift+9}
+
+# ---------- audio files stored on the robot ----------
+audio_files:
+  - title: Bip (gentle)
+    path: /usr/share/naoqi/wav/bip_gentle.wav
+  - title: Power ok
+    path: /usr/share/naoqi/wav/bip_power_ok.wav
+  - title: Random
+    path: /usr/share/naoqi/wav/random.wav
+  - title: Begin reco
+    path: /usr/share/naoqi/wav/begin_reco.wav
+  - title: End reco
+    path: /usr/share/naoqi/wav/end_reco.wav
+
+# ---------- movement increments ----------
+movement:
+  step_distance: 0.20     # metres per "step" button
+  turn_angle: 30          # degrees per "turn" button
+  walk_speed: 0.5         # fraction of max velocity while holding a direction
+  head_step: 10           # degrees per head nudge

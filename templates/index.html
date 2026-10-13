@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NAO WoZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2338bdf8'/><text x='16' y='22' font-size='16' text-anchor='middle' font-family='sans-serif' font-weight='700' fill='%230b1020'>N</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><div class="logo">N</div><div>NAO WoZ<small>Wizard-of-Oz console · NAO v6</small></div></div>
+  <div class="conn">
+    <input id="ip" type="text" list="iplist" placeholder="robot IP or hostname">
+    <datalist id="iplist"></datalist>
+    <button class="btn primary" id="btnConnect">Connect</button>
+    <button class="btn" id="btnDisconnect" style="display:none">Disconnect</button>
+  </div>
+  <div class="chips">
+    <span class="chip" id="chipConn"><span class="dot"></span><b id="robotName">offline</b></span>
+    <span class="chip" id="chipMock" style="display:none"><span class="badge">MOCK</span></span>
+    <span class="chip" title="battery"><span class="batt"><i id="battFill"></i></span><b id="battPct">–</b></span>
+    <span class="chip">posture <b id="stPosture">–</b></span>
+    <span class="chip">life <b id="stLife">–</b></span>
+    <span class="chip">volume <b id="stVolume">–</b></span>
+    <span class="chip" id="chipAwake">motors <b id="stAwake">–</b></span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ================= side nav ================= -->
+  <nav class="side" id="nav">
+    <button data-panel="speech" class="active"><svg viewBox="0 0 24 24"><path d="M4 5h16v10H9l-5 4z"/></svg>Speech</button>
+    <button data-panel="animations"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v6m0 0l-4 6m4-6l4 6M6 10l6-2 6 2"/></svg>Animations</button>
+    <button data-panel="motion"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M7 7l10 10M17 7L7 17"/></svg>Motion</button>
+    <button data-panel="leds"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10l2 2M5 19l2-2m10-10l2-2"/></svg>LEDs</button>
+    <button data-panel="sensors"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Sensors</button>
+    <button data-panel="camera"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 7l2-3h4l2 3"/></svg>Camera</button>
+    <button data-panel="audio"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg>Audio</button>
+    <button data-panel="life"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 017-2.6A4 4 0 0119 11c0 5.5-7 10-7 10z"/></svg>Autonomy</button>
+    <button data-panel="behaviors"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Behaviors</button>
+    <button data-panel="system"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>System</button>
+    <div class="sep"></div>
+    <button class="stopall" id="btnStopAll">■ STOP ALL <span class="kbd">Esc</span></button>
+  </nav>
+
+  <!-- ================= main ================= -->
+  <main>
+
+    <!-- ---------- SPEECH ---------- -->
+    <section class="panel active" id="panel-speech">
+      <h2>Speech <span>text-to-speech &amp; animated speech</span></h2>
+      <div class="grid c2">
+        <div class="card span2">
+          <h3>Say something <span class="right hint">Enter = say · Shift+Enter = newline</span></h3>
+          <textarea id="sayText" placeholder="Type what NAO should say… use ^start(animations/Stand/Gestures/Hey_1) tags for animated speech"></textarea>
+          <div class="row" style="margin-top:8px">
+            <button class="btn primary" id="btnSay">Say</button>
+            <label class="switch" id="swAnimated"><span>Animated speech (contextual body language)</span><span class="tog"></span></label>
+            <button class="btn danger" id="btnStopSpeech">Stop speech</button>
+            <span class="hint" style="margin-left:auto">History:</span>
+            <select id="sayHistory" style="max-width:260px"><option value="">(previously said)</option></select>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Presets <span class="right hint">from config.yaml</span></h3>
+          <div class="btngrid" id="speechPresets"></div>
+        </div>
+        <div class="card">
+          <h3>Voice</h3>
+          <div class="grid" style="gap:10px">
+            <label class="field"><span>Language</span><select id="ttsLang"></select></label>
+            <label class="field"><span>Volume <b id="volVal">–</b></span><input type="range" id="volume" min="0" max="100" step="1"></label>
+            <label class="field"><span>Speed <b id="speedVal">–</b></span><input type="range" id="ttsSpeed" min="50" max="400" step="5"></label>
+            <label class="field"><span>Pitch <b id="pitchVal">–</b></span><input type="range" id="ttsPitch" min="0.5" max="4" step="0.05"></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ANIMATIONS ---------- -->
+    <section class="panel" id="panel-animations">
+      <h2>Animations <span>ALAnimationPlayer</span></h2>
+      <div class="grid c2">
+        <div class="card span2">
+          <h3>Favourites <span class="right hint">from config.yaml</span></h3>
+          <div class="btngrid" id="animFavs"></div>
+        </div>
+        <div class="card span2">
+          <h3>All installed animations <span class="right"><input type="text" id="animFilter" placeholder="filter… e.g. Gestures/Hey" style="width:240px"> <button class="btn sm" id="btnAnimRefresh">Refresh</button></span></h3>
+          <div class="row" style="margin-bottom:8px">
+            <input type="text" id="animCustom" placeholder="custom animation path, e.g. animations/Stand/Gestures/Hey_1" style="flex:1">
+            <button class="btn" id="btnAnimCustom">Run</button>
+          </div>
+          <div class="list" id="animList"><div class="empty">connect to a robot to list animations</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- MOTION ---------- -->
+    <section class="panel" id="panel-motion">
+      <h2>Motion <span>postures, walking, head &amp; joints</span></h2>
+      <div class="grid c3">
+        <div class="card">
+          <h3>Motors</h3>
+          <div class="row">
+            <button class="btn ok" id="btnWake">Wake up</button>
+            <button class="btn" id="btnRest">Rest</button>
+          </div>
+          <h3 style="margin-top:14px">Stiffness</h3>
+          <div class="row tight" id="stiffChains"></div>
+          <h3 style="margin-top:14px">Hands</h3>
+          <div class="row tight">
+            <button class="btn sm" data-hand="LHand" data-open="1">Open L</button><button class="btn sm" data-hand="LHand" data-open="0">Close L</button>
+            <button class="btn sm" data-hand="RHand" data-open="1">Open R</button><button class="btn sm" data-hand="RHand" data-open="0">Close R</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Postures <span class="right">speed <b id="postureSpeedVal">0.7</b></span></h3>
+          <input type="range" id="postureSpeed" min="0.1" max="1" step="0.05" value="0.7" style="margin-bottom:10px">
+          <div class="btngrid" id="postures"></div>
+        </div>
+        <div class="card">
+          <h3>Walk <span class="right hint">hold buttons / arrow keys</span></h3>
+          <div class="dpad">
+            <button class="btn hold" data-move="0.5,0,0.5">↖</button>
+            <button class="btn hold" data-move="1,0,0">↑</button>
+            <button class="btn hold" data-move="0.5,0,-0.5">↗</button>
+            <button class="btn hold" data-move="0,0,1">⟲</button>
+            <button class="btn danger" id="btnStopMove">■</button>
+            <button class="btn hold" data-move="0,0,-1">⟳</button>
+            <button class="btn hold" data-move="0,1,0">←</button>
+            <button class="btn hold" data-move="-1,0,0">↓</button>
+            <button class="btn hold" data-move="0,-1,0">→</button>
+          </div>
+          <div class="row" style="margin-top:10px;justify-content:center">
+            <button class="btn sm" data-step="fwd">step fwd</button>
+            <button class="btn sm" data-step="back">step back</button>
+            <button class="btn sm" data-step="left">turn left</button>
+            <button class="btn sm" data-step="right">turn right</button>
+          </div>
+          <label class="field" style="margin-top:8px"><span>Walk speed <b id="walkSpeedVal">0.5</b></span><input type="range" id="walkSpeed" min="0.1" max="1" step="0.05" value="0.5"></label>
+        </div>
+        <div class="card">
+          <h3>Head <span class="right hint">click/drag · Shift+arrows</span></h3>
+          <div class="headpad" id="headpad"><div class="cross"></div><div class="cur" id="headCur"></div></div>
+          <label class="field" style="margin-top:8px"><span>Yaw <b id="yawVal">0°</b></span><input type="range" id="headYaw" min="-119" max="119" step="1" value="0"></label>
+          <label class="field"><span>Pitch <b id="pitchHVal">0°</b></span><input type="range" id="headPitch" min="-38" max="29" step="1" value="0"></label>
+          <div class="row" style="margin-top:8px"><button class="btn sm" id="btnHeadCenter">Center</button>
+            <label class="field" style="flex:1"><span>Speed <b id="headSpeedVal">0.2</b></span><input type="range" id="headSpeed" min="0.05" max="1" step="0.05" value="0.2"></label></div>
+        </div>
+        <div class="card span2">
+          <h3>Joints <span class="right"><button class="btn sm" id="btnJointsRefresh">Read current angles</button></span></h3>
+          <div class="joints" id="joints"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- LEDS ---------- -->
+    <section class="panel" id="panel-leds">
+      <h2>LEDs <span>eyes, ears, chest, feet, head</span></h2>
+      <div class="grid c2">
+        <div class="card">
+          <h3>Target group</h3>
+          <div class="row tight" id="ledGroups"></div>
+          <div class="eyes"><div class="eye" id="eyeL"></div><div class="eye" id="eyeR"></div></div>
+          <div class="row">
+            <input type="color" id="ledColor" value="#ffffff">
+            <button class="btn primary" id="btnLedApply">Apply colour</button>
+            <label class="field" style="flex:1"><span>Fade <b id="ledFadeVal">0.3s</b></span><input type="range" id="ledFade" min="0" max="3" step="0.1" value="0.3"></label>
+          </div>
+          <label class="field" style="margin-top:10px"><span>Intensity <b id="ledIntVal">1.0</b></span><input type="range" id="ledIntensity" min="0" max="1" step="0.05" value="1"></label>
+          <div class="row" style="margin-top:10px">
+            <button class="btn sm" id="btnLedOn">On</button>
+            <button class="btn sm" id="btnLedOff">Off</button>
+            <button class="btn sm" id="btnLedReset">Reset to default</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Colour presets</h3>
+          <div class="swatches" id="colorPresets"></div>
+          <h3 style="margin-top:16px">Eye animations <span class="right">duration <b id="eyeAnimDurVal">3s</b></span></h3>
+          <input type="range" id="eyeAnimDur" min="1" max="10" step="0.5" value="3" style="margin-bottom:10px">
+          <div class="row">
+            <button class="btn" data-eyeanim="rasta">Rasta</button>
+            <button class="btn" data-eyeanim="random">Random</button>
+            <button class="btn" data-eyeanim="rotate">Rotate</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- SENSORS ---------- -->
+    <section class="panel" id="panel-sensors">
+      <h2>Sensors <span>live from ALMemory · 4 Hz</span></h2>
+      <div class="grid c3">
+        <div class="card">
+          <h3>Touch &amp; buttons</h3>
+          <div class="touchmap" id="touchmap"></div>
+        </div>
+        <div class="card">
+          <h3>Sonar</h3>
+          <label class="field"><span>Left <b id="sonarLVal">–</b></span></label><div class="bar"><i id="sonarL"></i></div>
+          <label class="field" style="margin-top:8px"><span>Right <b id="sonarRVal">–</b></span></label><div class="bar"><i id="sonarR"></i></div>
+          <h3 style="margin-top:16px">Battery</h3>
+          <div class="kv" id="battKv"></div>
+        </div>
+        <div class="card">
+          <h3>Inertial unit</h3>
+          <div class="kv" id="imuKv"></div>
+          <h3 style="margin-top:16px">Feet (FSR)</h3>
+          <div class="kv" id="fsrKv"></div>
+        </div>
+        <div class="card span2">
+          <h3>Joint temperatures <span class="right hint">°C · yellow &gt; 55 · red &gt; 70</span></h3>
+          <div class="temps" id="temps"></div>
+        </div>
+        <div class="card">
+          <h3>ALMemory query</h3>
+          <div class="row"><input type="text" id="memKey" placeholder="e.g. Device/SubDeviceList/Battery/Charge/Sensor/Value" style="flex:1"><button class="btn sm" id="btnMem">Get</button></div>
+          <pre class="mono" id="memOut" style="white-space:pre-wrap;margin:8px 0 0;color:var(--muted)"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- CAMERA ---------- -->
+    <section class="panel" id="panel-camera">
+      <h2>Camera <span>ALVideoDevice MJPEG stream</span></h2>
+      <div class="grid c3">
+        <div class="card span2">
+          <div class="camwrap" id="camwrap"><span class="off">stream stopped</span></div>
+        </div>
+        <div class="card">
+          <h3>Settings</h3>
+          <label class="field"><span>Camera</span><div class="seg" id="camSel"><button data-v="0" class="active">Top</button><button data-v="1">Bottom</button></div></label>
+          <label class="field" style="margin-top:8px"><span>Resolution</span><select id="camRes"><option value="0">QQVGA 160×120</option><option value="1" selected>QVGA 320×240</option><option value="2">VGA 640×480</option><option value="3">4VGA 1280×960</option></select></label>
+          <label class="field" style="margin-top:8px"><span>Frame rate <b id="camFpsVal">10</b></span><input type="range" id="camFps" min="1" max="30" step="1" value="10"></label>
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary" id="btnCamStart">Start</button>
+            <button class="btn" id="btnCamStop">Stop</button>
+            <button class="btn" id="btnSnap">Snapshot</button>
+            <button class="btn" id="btnCamFs">Fullscreen</button>
+          </div>
+          <p class="hint">Snapshots are saved to the <code>snapshots/</code> folder next to the server.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- AUDIO ---------- -->
+    <section class="panel" id="panel-audio">
+      <h2>Audio <span>playback &amp; recording on the robot</span></h2>
+      <div class="grid c2">
+        <div class="card">
+          <h3>Sound files on the robot</h3>
+          <div class="btngrid" id="audioPresets"></div>
+          <div class="row" style="margin-top:10px">
+            <input type="text" id="audioPath" placeholder="/home/nao/sound.wav" style="flex:1">
+            <button class="btn" id="btnAudioPlay">Play</button>
+            <button class="btn danger" id="btnAudioStop">Stop</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Microphone recording</h3>
+          <p class="hint">Records the front microphone (16 kHz WAV) to <code id="recDir"></code> on the robot.</p>
+          <div class="row">
+            <button class="btn ok" id="btnRecStart">● Start recording</button>
+            <button class="btn" id="btnRecStop">■ Stop</button>
+          </div>
+          <h3 style="margin-top:16px">Master volume</h3>
+          <label class="field"><span>Volume <b id="volVal2">–</b></span><input type="range" id="volume2" min="0" max="100" step="1"></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- AUTONOMOUS LIFE ---------- -->
+    <section class="panel" id="panel-life">
+      <h2>Autonomy <span>ALAutonomousLife, awareness, idle behaviour</span></h2>
+      <div class="grid c2">
+        <div class="card">
+          <h3>Autonomous life state</h3>
+          <div class="seg" id="lifeStates">
+            <button data-v="disabled">Disabled</button><button data-v="solitary">Solitary</button>
+            <button data-v="interactive">Interactive</button><button data-v="safeguard">Safeguard</button>
+          </div>
+          <p class="hint">Disabled = full manual control (recommended for WoZ). Solitary = idle animations. Interactive = engages with people.</p>
+          <h3 style="margin-top:14px">Engagement</h3>
+          <div class="row">
+            <select id="engagement"><option>Unengaged</option><option>SemiEngaged</option><option>FullyEngaged</option></select>
+            <select id="tracking"><option>Head</option><option>BodyRotation</option><option>WholeBody</option><option>MoveContextually</option></select>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Idle behaviours</h3>
+          <div class="grid" style="gap:6px" id="lifeToggles"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- BEHAVIORS ---------- -->
+    <section class="panel" id="panel-behaviors">
+      <h2>Behaviors <span>ALBehaviorManager · apps installed on the robot</span></h2>
+      <div class="grid c2">
+        <div class="card span2">
+          <h3>Installed <span class="right"><input type="text" id="behFilter" placeholder="filter" style="width:200px"> <button class="btn sm" id="btnBehRefresh">Refresh</button> <button class="btn sm danger" id="btnBehStopAll">Stop all</button></span></h3>
+          <div class="list" id="behList"><div class="empty">connect to a robot to list behaviours</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- SYSTEM ---------- -->
+    <section class="panel" id="panel-system">
+      <h2>System <span>robot info, config &amp; shortcuts</span></h2>
+      <div class="grid c2">
+        <div class="card">
+          <h3>Robot</h3>
+          <div class="kv" id="sysKv"></div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn" id="btnReloadCfg">Reload config.yaml</button>
+            <button class="btn danger" id="btnReboot">Reboot robot</button>
+            <button class="btn danger" id="btnShutdown">Shutdown robot</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Keyboard shortcuts</h3>
+          <div class="kv" id="shortcutKv"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= right rail ================= -->
+  <aside class="rail">
+    <div class="card">
+      <h3>Live</h3>
+      <div class="kv" style="margin-bottom:8px">
+        <span>head</span><span id="liveHead">–</span>
+        <span>sonar</span><span id="liveSonar">–</span>
+        <span>battery</span><span id="liveBatt">–</span>
+      </div>
+      <div class="minitouch" id="miniTouch"></div>
+    </div>
+    <div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <h3>Activity log</h3>
+      <div class="log" id="log"></div>
+    </div>
+  </aside>
+</div>
+
+<div id="toasts"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>

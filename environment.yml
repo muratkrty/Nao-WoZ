@@ -1,0 +1,16 @@
+name: nao_woz
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - qi>=3.1
+      - fastapi
+      - uvicorn[standard]
+      - pyyaml
+      - pillow
+      - numpy
+      - jinja2
+      - python-multipart
