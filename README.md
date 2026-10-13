@@ -265,5 +265,5 @@ curl -X POST localhost:8000/api/say -H 'Content-Type: application/json' \
 ---
 
 <div align="center">
-<sub>Built for human-robot interaction research with NAO v6 · screenshots captured from <code>./run.sh --mock</code></sub>
+<sub>Built for human-robot interaction research with NAO v6 · developed with assistance from <a href="https://claude.com/claude-code">Claude Code</a> (Anthropic) · screenshots captured from <code>./run.sh --mock</code></sub>
 </div>
